@@ -14,6 +14,7 @@ def test_calibration(calibration_values, frequency):
 
     assert result == frequency
 
+
 @pytest.mark.parametrize("calibration_values,frequency", [
     ([+1, -1], 0),
     ([+3, +3, +4, -2, -4], 10),
