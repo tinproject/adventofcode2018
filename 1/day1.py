@@ -28,11 +28,11 @@ def calibrate():
 
     # Parti 1
     frequency = calibration(calibration_values)
-    print(f"Calibrate with frequency {frequency}")
+    print(f"Part1 - Calibrate with frequency: {frequency}")
 
     # Part 2
     dup_frequency = find_duplicate_frequency(calibration_values)
-    print(f"The first duplicated frequency is: {dup_frequency}")
+    print(f"Part2 - The first duplicated frequency is: {dup_frequency}")
 
 
 if __name__ == "__main__":
