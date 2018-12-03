@@ -30,6 +30,9 @@ class Claim:
         )
         return claim
 
+    def __str__(self):
+        return f"#{self.claim_id} @ {self.x},{self.y}: {self.width}x{self.height}"
+
 
 def get_claims_from_file():
     with open('./input', 'rt') as f:
@@ -59,6 +62,13 @@ class Fabric:
         total_tiles = self.fabric_side * self.fabric_side
         return total_tiles - non_used_tiles_number - used_but_non_overlaped_tiles_number
 
+    def is_claim_overlaped(self, claim):
+        for i in range(claim.x, claim.x + claim.width):
+            for j in range(claim.y, claim.y + claim.height):
+                if self.canvas[self._get_tile_index_from_coords(i, j)] > 1:
+                    return True
+        return False
+
 
 def get_canvas_square_inches_overlap(claims, fabric_side=FABRIC_CANVAS_SIDE):
     fabric = Fabric(fabric_side)
@@ -69,6 +79,18 @@ def get_canvas_square_inches_overlap(claims, fabric_side=FABRIC_CANVAS_SIDE):
     return fabric.get_number_of_overlaped_tiles()
 
 
+def get_non_overlaped_claim(claims, fabric_side=FABRIC_CANVAS_SIDE):
+    fabric = Fabric(fabric_side)
+
+    for claim in claims:
+        fabric.put_claim_on_canvas(claim)
+
+    for claim in claims:
+        is_overlaped = fabric.is_claim_overlaped(claim)
+        if not is_overlaped:
+            return claim
+
+
 def solve():
     claims = get_claims_from_file()
 
@@ -77,8 +99,8 @@ def solve():
     print(f"Part1 - The overlaped square inches tiles are: {overlaped_tiles}")
 
     # Part 2
-    # common_letters = get_letters_in_common(box_ids)
-    # print(f"Part2 - The letters in common are: {common_letters}")
+    non_overlaped_claim = get_non_overlaped_claim(claims)
+    print(f"Part2 - The non overlapped claim ID is: {non_overlaped_claim.claim_id}")
 
 
 if __name__ == "__main__":

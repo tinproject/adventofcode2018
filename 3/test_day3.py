@@ -1,3 +1,4 @@
+import pytest
 
 from day3 import Claim, Fabric, get_canvas_square_inches_overlap
 
@@ -11,12 +12,16 @@ def test_get_claim_from_text():
     assert result == expected_claim
 
 
-def test_get_canvas_square_inches_overlap():
-    claims = [
+@pytest.fixture()
+def claims():
+    return [
         Claim.from_text("#1 @ 1,3: 4x4"),
         Claim.from_text("#2 @ 3,1: 4x4"),
         Claim.from_text("#3 @ 5,5: 2x2"),
     ]
+
+
+def test_get_canvas_square_inches_overlap(claims):
     expected_square_inches_overlap = 4
     fabric_canvas_size = 8
 
@@ -62,3 +67,15 @@ def test_fabric_put_claim_on_canvas():
     result = fabric.canvas
 
     assert result.count(1) == claim.width * claim.height
+
+
+def test_fabric_is_claim_overlaped(claims):
+    overlaped_claims = [True, True, False]
+    fabric_side = 8
+    fabric = Fabric(fabric_side)
+
+    for claim in claims:
+        fabric.put_claim_on_canvas(claim)
+
+    for claim, overlaped in zip(claims, overlaped_claims):
+        assert fabric.is_claim_overlaped(claim) == overlaped
