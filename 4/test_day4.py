@@ -1,6 +1,6 @@
 
 from day4 import Observation, get_guard_shifts, get_minutes_sleep, get_max_sleep_guard, get_minute_more_sleep, \
-    get_minute_more_sleep_for_max_guard_sleeper
+    get_minute_more_sleep_for_max_guard_sleeper, get_most_frequest_sleeper_code
 
 
 example_input_observations = sorted(l.strip() for l in str.splitlines(
@@ -22,7 +22,7 @@ example_input_observations = sorted(l.strip() for l in str.splitlines(
 [1518-11-05 00:03] Guard #99 begins shift
 [1518-11-05 00:45] falls asleep
 [1518-11-05 00:55] wakes up
-""") if l)
+""") if l)  # noqa
 
 
 def test_get_minutes_sleep():
@@ -48,7 +48,7 @@ def test_get_minute_more_sleep():
     minutes_sleep = get_minutes_sleep(guard_shifts)
     max_sleeper = get_max_sleep_guard(minutes_sleep)
 
-    result = get_minute_more_sleep(max_sleeper, guard_shifts)
+    result, _ = get_minute_more_sleep(max_sleeper, guard_shifts)
 
     assert result == 24
 
@@ -59,6 +59,14 @@ def test_get_minute_more_sleep_for_max_guard_sleeper():
     result = get_minute_more_sleep_for_max_guard_sleeper(guard_shifts)
 
     assert result == 240
+
+
+def test_get_most_frequest_sleeper_code():
+    guard_shifts = get_guard_shifts(example_input_observations)
+
+    result = get_most_frequest_sleeper_code(guard_shifts)
+
+    assert result == 4455
 
 
 def test_guard_begins_shift_observation():

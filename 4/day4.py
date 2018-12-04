@@ -105,6 +105,8 @@ class GuardShift:
         return self.timetable.count(self.STATE_ASLEEP)
 
     def get_state_for_minute(self, minute):
+        if not self.processed:
+            self.process_shift()
         return self.timetable[minute]
 
 
@@ -142,7 +144,7 @@ def get_max_sleep_guard(minutes_sleep):
     return guard_id
 
 
-def get_minute_more_sleep(guard_id, guard_shifts):
+def get_minutes_more_sleeped(guard_id, guard_shifts):
     guard_duty = (s for s in guard_shifts if s.guard_id == guard_id)
     minutes = list(0 for _ in range(GuardShift.TIMETABLE_MINUTES))
 
@@ -150,17 +152,37 @@ def get_minute_more_sleep(guard_id, guard_shifts):
         for i in range(len(minutes)):
             sleep = 1 if shift.get_state_for_minute(i) == GuardShift.STATE_ASLEEP else 0
             minutes[i] += sleep
+    return minutes
 
-    return max(enumerate(minutes), key=lambda x: x[1])[0]
+
+def get_minute_more_sleep(guard_id, guard_shifts):
+    minutes = get_minutes_more_sleeped(guard_id, guard_shifts)
+
+    minute, frequency = max(enumerate(minutes), key=lambda x: x[1])
+    return minute, frequency
 
 
 def get_minute_more_sleep_for_max_guard_sleeper(guard_shifts):
     minutes_sleep = get_minutes_sleep(guard_shifts)
     max_sleeper = get_max_sleep_guard(minutes_sleep)
 
-    minute_most_sleep = get_minute_more_sleep(max_sleeper, guard_shifts)
+    minute_most_sleep, _ = get_minute_more_sleep(max_sleeper, guard_shifts)
 
     return max_sleeper * minute_most_sleep
+
+
+def get_most_frequest_sleeper_code(guard_shifts):
+    guard_ids = list(set(s.guard_id for s in guard_shifts))
+
+    minutes_more_sleeped = []
+    for guard in guard_ids:
+        minutes = get_minutes_more_sleeped(guard, guard_shifts)
+        minute, frequency = max(enumerate(minutes), key=lambda x: x[1])
+        minutes_more_sleeped.append((guard, minute, frequency))
+
+    most_frequent_sleeper_guard = max(minutes_more_sleeped, key=lambda x: x[2])
+
+    return most_frequent_sleeper_guard[0] * most_frequent_sleeper_guard[1]
 
 
 def get_data():
@@ -174,13 +196,13 @@ def solve():
 
     guard_shifts = get_guard_shifts(data)
 
-    code = get_minute_more_sleep_for_max_guard_sleeper(guard_shifts)
-
     # Part 1
+    code = get_minute_more_sleep_for_max_guard_sleeper(guard_shifts)
     print(f"Part1 - The solution is: {code}")
 
     # Part 2
-    print(f"Part2 - ... is: {None}")
+    code = get_most_frequest_sleeper_code(guard_shifts)
+    print(f"Part2 - The solution is: {code}")
 
 
 if __name__ == "__main__":
