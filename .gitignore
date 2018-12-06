@@ -1,2 +1,6 @@
 
 venv
+
+.cache/
+.test_day.py.swp
+__pycache__/
