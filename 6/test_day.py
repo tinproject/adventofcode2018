@@ -2,7 +2,7 @@ import pytest
 
 from day import (
     get_coordinates, get_bounding_box, point_has_infinite_area, get_points_with_infinite_area,
-    distance, get_largest_area
+    distance, get_largest_area, get_region_size_with_less_distance, get_cumulative_distance
 )
 
 
@@ -82,3 +82,23 @@ def test_get_largest_area():
     result = get_largest_area(coords)
 
     assert result == largest_area
+
+
+def test_get_region_size_with_less_distance():
+    coords = get_coordinates(input_data.splitlines())
+    max_cum_distance = 32
+    resgion_size = 16
+
+    result = get_region_size_with_less_distance(coords, max_cum_distance)
+
+    assert result == resgion_size
+
+
+def test_get_cumulative_distance():
+    points = get_coordinates(input_data.splitlines())
+    place = (4, 3)
+    cum_distance = 30
+
+    result = get_cumulative_distance(place, points)
+
+    assert result == cum_distance

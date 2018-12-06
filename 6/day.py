@@ -100,6 +100,31 @@ def get_largest_area(coords):
     return size
 
 
+def get_cumulative_distance(place, points):
+    cum_distance = sum((distance(place, p) for p in points))
+    return cum_distance
+
+
+def get_region_size_with_less_distance(coords, max_cum_distance):
+    border = 0
+    bounding_box = get_bounding_box(coords)
+    max_x = bounding_box[1][0] + border + 1
+    max_y = bounding_box[1][1] + border + 1
+
+    distance_matrix = dict()
+    for i in range(-border, max_x):
+        for j in range(-border, max_y):
+            place = (i, j)
+            cum_distance = get_cumulative_distance(place, coords)
+            if cum_distance < max_cum_distance:
+                distance_matrix[place] = True
+            else:
+                distance_matrix[place] = False
+    bigger_region_size = Counter(distance_matrix.values())[True]
+
+    return bigger_region_size
+
+
 def get_data():
     with open('./input', 'rt') as f:
         values = f.readlines()
@@ -116,7 +141,9 @@ def solve():
     print(f"Part1 - The largest non infinite area is: {largest_area_size}")
 
     # Part 2
-    print(f"Part2 - ... is: {None}")
+    max_cum_distance = 10000
+    region_size = get_region_size_with_less_distance(coords, max_cum_distance)
+    print(f"Part2 - The biggest region size with cumulative distance less than {max_cum_distance} is: {region_size}")
 
 
 if __name__ == "__main__":
