@@ -1,7 +1,7 @@
 import pytest
 
 
-from day import compact_units, get_polymer_units, react
+from day import compact_units, get_polymer_units, react, improve_polymer, get_better_polymer
 
 
 @pytest.mark.parametrize("input1,input2,output", [
@@ -42,3 +42,26 @@ def test_get_polymer_units():
 
     assert resutl == expected_units
 
+
+@pytest.mark.parametrize("unit,output", [
+    ("a", "dbCBcD"),
+    ("A", "dbCBcD"),
+    ("b", "daCAcaDA"),
+    ("c", "daDA"),
+    ("d", "abCBAc"),
+])
+def test_improve_polymer(unit, output):
+    polymer = "dabAcCaCBAcCcaDA"
+
+    result = improve_polymer(polymer, unit)
+
+    assert result == output
+
+
+def test_get_better_polymer():
+    polymer = "dabAcCaCBAcCcaDA"
+    better_polymer = "daDA"
+
+    result = get_better_polymer(polymer)
+
+    assert result == better_polymer

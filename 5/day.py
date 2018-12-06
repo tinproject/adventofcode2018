@@ -1,4 +1,3 @@
-from collections import Counter
 
 
 def react(unit1, unit2):
@@ -32,6 +31,20 @@ def compact_units(polymer):
     return new_polymer
 
 
+def improve_polymer(polymer, unit):
+    reduced_polymer = polymer.replace(unit.lower(), "").replace(unit.upper(), "")
+    return compact_units(reduced_polymer)
+
+
+def get_better_polymer(start_polymer):
+    units = set(start_polymer.lower())
+    polymers = []
+    for unit in units:
+        polymers.append(improve_polymer(start_polymer, unit))
+    better_polymer = sorted(polymers, key=len)[0]
+    return better_polymer
+
+
 def get_polymer_units(polymer):
     stable_polymer = compact_units(polymer)
     return len(stable_polymer)
@@ -51,7 +64,8 @@ def solve():
     print(f"Part1 - The solution is: {part1}")
 
     # Part 2
-    part2 = None
+    better_polymer = get_better_polymer(data)
+    part2 = get_polymer_units(better_polymer)
     print(f"Part2 - The solution is: {part2}")
 
 
