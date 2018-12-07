@@ -2,7 +2,7 @@
 
 def get_data():
     with open('./input', 'rt') as f:
-        values = f.readlines()
+        values = [line.strip() for line in f.readlines()]
     return values
 
 
