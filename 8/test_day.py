@@ -63,10 +63,20 @@ def test_get_metadata_sum(example_data):
     assert result == expected_output
 
 
-@pytest.mark.skip
 def test_get_node_value(example_data):
-    expected_value = 33
+    expected_value = 66
+    expected_next_index = 16
 
     result = get_node_value(example_data)
 
-    assert result == expected_value
+    assert result == (expected_value, expected_next_index)
+
+
+def test_get_node_value_no_childs():
+    node = [0, 3, 10, 11, 12]
+    expected_value = 33
+    expected_next_index = 5
+
+    result = get_node_value(node)
+
+    assert result == (expected_value, expected_next_index)

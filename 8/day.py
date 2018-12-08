@@ -32,8 +32,26 @@ def get_metadata_sum(node):
     return sum(metadata)
 
 
-def get_node_value(node):
-    pass
+def get_node_value(node, index=0):
+    num_children = node[0 + index]
+    num_metadata = node[1 + index]
+
+    _, end_node_index = get_node_metadata(node, index)
+    metadata = node[end_node_index - num_metadata: end_node_index]
+    end_index = 2 + index
+
+    if num_children == 0:
+        end_index += num_metadata
+        return sum(metadata), end_index
+
+    child_values = dict()
+    for child in range(1, num_children + 1):
+        v, end_index = get_node_value(node, end_index)
+        child_values[child] = v
+
+    value = sum(child_values[c] for c in metadata if c in child_values)
+    end_index += num_metadata
+    return value, end_index
 
 
 def solve():
@@ -44,7 +62,8 @@ def solve():
     print(f"Part1 - The license code is: {license_code}")
 
     # Part 2
-    print(f"Part2 - ... is: {None}")
+    node_value, _ = get_node_value(data)
+    print(f"Part2 - The second check (node value) is: {node_value}")
 
 
 if __name__ == "__main__":
