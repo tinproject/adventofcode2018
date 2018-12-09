@@ -23,6 +23,8 @@ def calc_circular_index(playground, current_marble_index, delta):
 
 
 class PlaygroundLocation:
+    __slots__ = ['marble', 'cw', 'ccw']
+
     def __init__(self, marble, cw=None, ccw=None):
         self.marble = marble
         self.cw = cw
