@@ -22,28 +22,64 @@ def calc_circular_index(playground, current_marble_index, delta):
     return new_index % len(playground)
 
 
-def get_highest_score(num_players, last_marble_points):
-    playground = [0]
-    current_marble_index = 0
+class PlaygroundLocation:
+    def __init__(self, marble, cw=None, ccw=None):
+        self.marble = marble
+        self.cw = cw
+        self.ccw = ccw
 
-    players = cycle(range(1, num_players + 1))
-    player_scores = [0 for _ in range(num_players + 1)]
+    def __repr__(self):
+        return f"Marble {self.marble}, cw={self.cw.marble}, ccw={self.ccw.marble}"
 
-    for marble in range(1, last_marble_points + 1):
-        player = next(players)
 
+class ElfMarbleGame:
+    def __init__(self, num_players):
+        self.num_players = num_players
+        self.player_scores = [0 for _ in range(num_players + 1)]
+        self.current_marble = PlaygroundLocation(0)
+        self.current_marble.cw = self.current_marble
+        self.current_marble.ccw = self.current_marble
+
+    def put_marble(self, marble, player):
         if marble % 23 == 0:
-            next_marble_index = calc_circular_index(playground, current_marble_index, -7)
-            marble_removed = playground.pop(next_marble_index)
-            player_scores[player] += marble
-            player_scores[player] += marble_removed
+            self.player_scores[player] += marble
+            rm = self.pop_marble()
+            self.player_scores[player] += rm
         else:
-            next_marble_index = calc_circular_index(playground, current_marble_index, +2)
-            playground.insert(next_marble_index, marble)
+            left = self.current_marble.cw
+            right = left.cw
+            m = PlaygroundLocation(marble, cw=right, ccw=left)
+            left.cw = m
+            right.ccw = m
+            self.current_marble = m
 
-        current_marble_index = next_marble_index
+    def pop_marble(self):
+        for _ in range(6):
+            self.current_marble = self.current_marble.ccw
 
-    return max(player_scores)
+        rm = self.current_marble.ccw
+        right = rm.ccw
+        right.cw = self.current_marble
+        self.current_marble.ccw = right
+        return rm.marble
+
+    def play(self, last_marble_points):
+        players = cycle(range(1, self.num_players + 1))
+
+        for marble in range(1, last_marble_points + 1):
+            player = next(players)
+            self.put_marble(marble, player)
+
+    def get_highest_score(self):
+        return max(self.player_scores)
+
+
+def get_highest_score(num_players, last_marble_points):
+    game = ElfMarbleGame(num_players)
+
+    game.play(last_marble_points)
+
+    return game.get_highest_score()
 
 
 def solve():
