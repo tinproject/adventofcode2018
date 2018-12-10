@@ -88,8 +88,6 @@ def get_sky_at_ts(ligthpoints, ts):
     max_y = max(points, key=attrgetter('y')).y + 1
     dy = max_y - min_y + 1
 
-    print(dx, dy)
-
     sky = []
     for _ in range(dy):
         sky.append(['_'] * dx)
@@ -111,7 +109,7 @@ def solve():
     get_sky_at_ts(lightpoints, message_ts)
 
     # Part 2
-    print(f"Part2 - ... is: {None}")
+    print(f"Part2 - The Elves have needed to wait {message_ts} seconds")
 
 
 if __name__ == "__main__":
