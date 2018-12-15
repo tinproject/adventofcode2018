@@ -32,6 +32,14 @@ class ChocolateMixer:
 
         return self.state[value:value+10]
 
+    def find_recipes_index(self, recipes):
+        if recipes not in self.state:
+            while recipes not in self.state[-8:]:
+                self.mix_recipes()
+
+        index = self.state.index(recipes)
+        return index
+
     def __repr__(self):
         return f"({self.tick:3})E1:{self.elf1_recipe} E2:{self.elf2_recipe} S:{self.state}"
 
@@ -45,7 +53,8 @@ def solve():
     print(f"Part1 - The scores of the 10 recipes after {input_data} recipes is: {r}")
 
     # Part 2
-    print(f"Part2 - ... is: {None}")
+    index = mixer.find_recipes_index("503761")
+    print(f"Part2 - It appear {index} recipes to the left of our input.")
 
 
 if __name__ == "__main__":
