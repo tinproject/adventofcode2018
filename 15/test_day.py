@@ -1,4 +1,3 @@
-import pytest
 from unittest.mock import Mock
 
 from day import Mob, BattleField
@@ -38,7 +37,7 @@ def test_battle_outcome_0():
     #G..G..G#
     #########
     """
-    battle_outcome = 29374
+    battle_outcome = 27828
     battlefield = BattleField(parse_battle_field_input(battle_input))
 
     result = battlefield.get_battle_outcome()
@@ -48,12 +47,12 @@ def test_battle_outcome_0():
 
 def test_battle_outcome_1():
     battle_input = """
-    #######   
+    #######
     #.G...#
     #...EG#
     #.#.#G#
     #..G#E#
-    #.....#   
+    #.....#
     #######
     """
     battle_outcome = 27730
@@ -72,7 +71,7 @@ def test_battle_outcome_2():
     #G.##.#
     #...#E#
     #...E.#
-    ####### 
+    #######
     """
     battle_outcome = 36334
     battlefield = BattleField(parse_battle_field_input(battle_input))
@@ -84,12 +83,12 @@ def test_battle_outcome_2():
 
 def test_battle_outcome_3():
     battle_input = """
-    #######   
+    #######
     #E..EG#
     #.#G.E#
     #E.##E#
     #G..#.#
-    #..E#.#   
+    #..E#.#
     #######
     """
     battle_outcome = 39514
@@ -102,10 +101,10 @@ def test_battle_outcome_3():
 
 def test_battle_outcome_4():
     battle_input = """
-    #######   
+    #######
     #E.G#.#
     #.#G..#
-    #G.#.G#   
+    #G.#.G#
     #G..#.#
     #...E.#
     #######
@@ -120,13 +119,13 @@ def test_battle_outcome_4():
 
 def test_battle_outcome_5():
     battle_input = """
-    #######   
-    #.E...#   
+    #######
+    #.E...#
     #.#..G#
-    #.###.#   
-    #E#G#G#   
+    #.###.#
+    #E#G#G#
     #...#G#
-    ####### 
+    #######
     """
     battle_outcome = 28944
     battlefield = BattleField(parse_battle_field_input(battle_input))
@@ -138,14 +137,14 @@ def test_battle_outcome_5():
 
 def test_battle_outcome_6():
     battle_input = """
-    #########   
+    #########
     #G......#
     #.E.#...#
     #..##..G#
-    #...##..#   
+    #...##..#
     #...#...#
-    #.G...G.#   
-    #.....G.#   
+    #.G...G.#
+    #.....G.#
     #########
     """
     battle_outcome = 18740
@@ -158,54 +157,14 @@ def test_battle_outcome_6():
 
 def test_battle_outcome_7():
     battle_input = """
-    #########   
-    #G......#
-    #.E.#...#
-    #..##..G#
-    #...##..#   
-    #...#...#
-    #.G...G.#   
-    #.....G.#   
     #########
-    """
-    battle_outcome = 18740
-    battlefield = BattleField(parse_battle_field_input(battle_input))
-
-    result = battlefield.get_battle_outcome()
-
-    assert result == battle_outcome
-
-
-def test_battle_outcome_6():
-    battle_input = """
-    #########   
     #G......#
     #.E.#...#
     #..##..G#
-    #...##..#   
+    #...##..#
     #...#...#
-    #.G...G.#   
-    #.....G.#   
-    #########
-    """
-    battle_outcome = 18740
-    battlefield = BattleField(parse_battle_field_input(battle_input))
-
-    result = battlefield.get_battle_outcome()
-
-    assert result == battle_outcome
-
-
-def test_battle_outcome_6():
-    battle_input = """
-    #########   
-    #G......#
-    #.E.#...#
-    #..##..G#
-    #...##..#   
-    #...#...#
-    #.G...G.#   
-    #.....G.#   
+    #.G...G.#
+    #.....G.#
     #########
     """
     battle_outcome = 18740

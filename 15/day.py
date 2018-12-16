@@ -46,6 +46,7 @@ class Mob:
         return self.x, self.y
 
     def play_turn(self):
+        # print(f"==> Unit {self} taking it's turn.")
         if self.hit_points <= 0:
             # raise Exception
             return f"{self} | We already died. Skip!"
@@ -57,7 +58,6 @@ class Mob:
         action = f"{self}"
 
         # Look if we do not have enemies adjacent to move
-        sides = self._get_adjacent_squares()
         if not any(e in self.enemy for e in self._get_adjacent_squares()):
             # Can we move?
             if self.battlefield.get_empty_squares_coords_around_point(self.coord):
@@ -68,7 +68,7 @@ class Mob:
         # Look for enemies in range adjacent to attack
         adjacent_coords = self._get_adjacent_coords()
         enemies_for_attack = []
-        for enemy in enemies:
+        for enemy in self.battlefield.get_enemies(self.enemy):
             if enemy.coord in adjacent_coords:
                 enemies_for_attack.append(enemy)
         if enemies_for_attack:
@@ -87,12 +87,14 @@ class Mob:
         for enemy in enemies:
             targets.update(self.battlefield.get_empty_squares_coords_around_point(enemy.coord))
 
+        empty_mob_adjacent_squares = self.battlefield.get_empty_squares_coords_around_point(origin)
+
         # Find reachable targets
         nearest_targets = set()
         visited_squares = set(origin)
         distance = 0
-        next_to_visit_squares = set(self.battlefield.get_empty_squares_coords_around_point(origin))
-        while not nearest_targets and next_to_visit_squares:
+        next_to_visit_squares = set(empty_mob_adjacent_squares)
+        while (not nearest_targets) and next_to_visit_squares:
             distance += 1
             # print(f"Looking at distance {distance}")
             to_visit_squares = next_to_visit_squares
@@ -107,6 +109,7 @@ class Mob:
                     if coord not in visited_squares:
                         next_to_visit_squares.add(coord)
 
+        # print(nearest_targets)
         if not nearest_targets:
             return f" | We can't reach any target. Stay in place!"
 
@@ -116,35 +119,34 @@ class Mob:
         chosen_target = sorted(nearest_targets, key=itemgetter(1, 0))[0]
         # print(f"We choose target at {chosen_target}")
 
-        # If there are multiple paths with same distance, choose the order
-        origin = chosen_target
-        targets = self.battlefield.get_empty_squares_coords_around_point(self.coord)
-        nearest_targets = set()
-        visited_squares = set(origin)
-        distance = 0
-        next_to_visit_squares = set(self.battlefield.get_empty_squares_coords_around_point(origin))
+        # If chosen target is not adjacent, find paths
+        if chosen_target not in empty_mob_adjacent_squares:
+            # If there are multiple paths with same distance, choose the order
+            origin = chosen_target
+            targets = self.battlefield.get_empty_squares_coords_around_point(self.coord)
+            nearest_targets = set()
+            visited_squares = set(origin)
+            distance = 0
+            next_to_visit_squares = set(self.battlefield.get_empty_squares_coords_around_point(origin))
 
-        while not nearest_targets and next_to_visit_squares:
-            distance += 1
-            # print(f"Looking at distance {distance}")
-            to_visit_squares = next_to_visit_squares
-            next_to_visit_squares = set()
-            while to_visit_squares:
-                visit = to_visit_squares.pop()
-                # print(f"Visiting {visit}")
-                visited_squares.add(visit)
-                if visit in targets:
-                    nearest_targets.add(visit)  # We reach a target
-                for coord in self.battlefield.get_empty_squares_coords_around_point(visit):
-                    if coord not in visited_squares:
-                        next_to_visit_squares.add(coord)
+            while (not nearest_targets) and next_to_visit_squares:
+                distance += 1
+                # print(f"Looking at distance {distance}")
+                to_visit_squares = next_to_visit_squares
+                next_to_visit_squares = set()
+                while to_visit_squares:
+                    visit = to_visit_squares.pop()
+                    # print(f"Visiting {visit}")
+                    visited_squares.add(visit)
+                    if visit in targets:
+                        nearest_targets.add(visit)  # We reach a target
+                    for coord in self.battlefield.get_empty_squares_coords_around_point(visit):
+                        if coord not in visited_squares:
+                            next_to_visit_squares.add(coord)
+            chosen_target = sorted(nearest_targets, key=itemgetter(1, 0))[0]
 
-        if not nearest_targets:
-            move_to = chosen_target
-        else:
-            move_to = sorted(nearest_targets, key=itemgetter(1, 0))[0]
-        self.move(move_to)
-        return f" | Moved to {move_to}"
+        self.move(chosen_target)
+        return f" | Moved to {chosen_target}"
 
     def _get_adjacent_squares(self):
         adjacent_coords = (
@@ -168,7 +170,10 @@ class Mob:
         self.battlefield.set_square(*self.coord, EMPTY_SPACE)
         if self.battlefield.get_square(*to_position) != EMPTY_SPACE:
             raise ValueError(f"{self} | ERROR: Trying to move to a non empty square.")
-        self.x, self.y = to_position
+        if 1 < abs(to_position[0] - self.x) > 0 or 1 < abs(to_position[1] - self.y) > 0:
+            raise Exception
+        self.x = to_position[0]
+        self.y = to_position[1]
         self.battlefield.set_square(*to_position, self.mob_type)
 
     def attack(self, other):
@@ -211,32 +216,28 @@ class BattleField:
                 if pos in ALL_MOBS:
                     self.mobs.append(Mob(self, x, y, pos))
 
-    def get_battle_outcome(self):
-        print(self)
-        for _ in range(200):  # Limit rounds
-            self.play_round()
-            mob_types = set(m.mob_type for m in self.mobs)
-            if len(mob_types) <= 1:
-                end_round = self.round - 1
+    def get_battle_outcome(self, max_rounds=100):
+        for _ in range(max_rounds):  # Limit rounds
+            if self.play_round():
+                full_rounds = self.round - 1
                 total_points = sum(m.hit_points for m in self.mobs)
-                battle_outcome = end_round * total_points
-                # print(self)
-                print(f"====> Only one type of mob remains {mob_types}, the battle is finished.")
-                print(f"====> End round: {end_round} Total points: {total_points} Outcome: {battle_outcome}")
+                battle_outcome = full_rounds * total_points
+                print(self)
+                print(f"====> Combat ends at round {self.round}!")
+                print(f"====> Full rounds completed: {full_rounds} "
+                      f"Total points: {total_points} Outcome: {battle_outcome}")
                 return battle_outcome
 
     def play_round(self):
         self.round += 1
-        print(f"===> Playing Round: {self.round}")
+        # print(f"====> Playing Round: {self.round}")
         for mob in sorted(self.mobs):
             turn_result = mob.play_turn()
-            print(turn_result)
+            # print(turn_result)
             if "No more enemies left" in turn_result:
-                print("Ending game")
-                break
-            # print(self)
-
-        print(self)
+                return True  # Combat ends
+        # print(self)
+        return False
 
     def set_square(self, x, y, square):
         self.playground[y][x] = square
@@ -269,7 +270,8 @@ class BattleField:
     def __repr__(self):
         playground = "\n".join("".join(line) for line in self.playground)
         mobs = "\n".join(repr(m) for m in sorted(self.mobs))
-        return f"====> Playground after round ({self.round}): \n{playground}\n====> Mobs: \n{mobs}"
+        return f"===> Playground after {self.round} rounds: \n{playground}\n" \
+            f"===> Mobs after {self.round} rounds: \n{mobs}"
 
 
 def get_data():
