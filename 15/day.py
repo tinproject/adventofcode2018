@@ -22,6 +22,10 @@ ELF = 'E'
 GOBLIN = 'G'
 
 ALL_MOBS = (ELF, GOBLIN)
+MOB_NAMES = {
+    ELF: "Elves",
+    GOBLIN: "Goblins"
+}
 
 
 class Mob:
@@ -200,7 +204,7 @@ class Mob:
 
 
 class BattleField:
-    def __init__(self, initial_state):
+    def __init__(self, initial_state, elves_attack_power=3):
         self.round = 0
         self.mobs = []
         self.playground = []
@@ -213,20 +217,44 @@ class BattleField:
 
         for y, line in enumerate(initial_state):
             for x, pos in enumerate(line):
-                if pos in ALL_MOBS:
+                if pos in GOBLIN:
                     self.mobs.append(Mob(self, x, y, pos))
+                elif pos in ELF:
+                    self.mobs.append(Mob(self, x, y, pos, attack_points=elves_attack_power))
 
-    def get_battle_outcome(self, max_rounds=100):
+    def get_battle_outcome(self):
+        full_rounds = self.round - 1
+        total_points = sum(m.hit_points for m in self.mobs)
+        battle_outcome = full_rounds * total_points
+        print(f"====> Full rounds completed: {full_rounds} "
+              f"Total points: {total_points} Outcome: {battle_outcome}")
+        return battle_outcome
+
+    def run_battle(self, max_rounds=100):
         for _ in range(max_rounds):  # Limit rounds
             if self.play_round():
-                full_rounds = self.round - 1
-                total_points = sum(m.hit_points for m in self.mobs)
-                battle_outcome = full_rounds * total_points
+                winning_mobs = MOB_NAMES[self.mobs[0].mob_type]
                 print(self)
-                print(f"====> Combat ends at round {self.round}!")
-                print(f"====> Full rounds completed: {full_rounds} "
-                      f"Total points: {total_points} Outcome: {battle_outcome}")
-                return battle_outcome
+                print(f"====> Combat ends at round {self.round}, {winning_mobs} win!")
+                break
+
+    def run_elves_winning_simulation(self, max_rounds=100):
+        initial_elves_number = sum(1 for m in self.mobs if m.mob_type == ELF)
+        for _ in range(max_rounds):  # Limit rounds
+            battle_finished = self.play_round()
+            current_elves_number = sum(1 for m in self.mobs if m.mob_type == ELF)
+            if initial_elves_number > current_elves_number:
+                # Some elf die..
+                return False
+
+            if battle_finished:
+                winning_mobs = MOB_NAMES[self.mobs[0].mob_type]
+                print(self)
+                print(f"====> Combat ends at round {self.round}, {winning_mobs} win!")
+                return True if winning_mobs == MOB_NAMES[ELF] else False
+
+        print(f"Elves can't win with less than {max_rounds} rounds!!")
+        return False  # Elves lose
 
     def play_round(self):
         self.round += 1
@@ -274,6 +302,18 @@ class BattleField:
             f"===> Mobs after {self.round} rounds: \n{mobs}"
 
 
+def run_elves_simulation(battle_input, max_elves_power=50):
+
+    for elves_attack_points in range(3, max_elves_power):
+        battlefield = BattleField(battle_input, elves_attack_points)
+        if battlefield.run_elves_winning_simulation():
+            # Elves win
+            outcome = battlefield.get_battle_outcome()
+            return outcome, elves_attack_points
+    else:
+        print(f"Elves can't win with an attack power less than {max_elves_power}!!")
+
+
 def get_data():
     with open('./input', 'rt') as f:
         values = [line.strip() for line in f.readlines()]
@@ -289,11 +329,13 @@ def solve():
 
     # Part 1
     battlefield = parse_input(data)
+    battlefield.run_battle()
     battle_result = battlefield.get_battle_outcome()
     print(f"Part1 - The battle outcome is: {battle_result}")
 
     # Part 2
-    # print(f"Part2 - ... is: {None}")
+    battle_outcome, elves_attack_points = run_elves_simulation(data)
+    print(f"Part2 - Elves win with {elves_attack_points} attack points. The battle have an outcome of: {battle_outcome}")
 
 
 if __name__ == "__main__":
