@@ -60,3 +60,14 @@ def test_get_water_tiles_count(example_data):
     result = ground.get_water_tiles_count()
 
     assert result == expected_count
+
+
+def test_get_still_water_tiles_count(example_data):
+    water_spring = Coord(500, 0)
+    ground = Ground(example_data, water_spring)
+    expected_count = 29
+
+    ground.water_flow()
+    result = ground.get_still_water_tiles_count()
+
+    assert result == expected_count

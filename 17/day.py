@@ -95,7 +95,7 @@ class Ground:
             start: Coord = self.water_spring
 
         flow_to_process = deque([start])
-        print(f"min {self.min} max {self.max}")
+        # print(f"min {self.min} max {self.max}")
 
         while flow_to_process:
             current = flow_to_process.popleft()
@@ -199,6 +199,11 @@ class Ground:
                     self.min.y <= t.y <= self.max.y and v in (STILL_WATER, FLOWING_WATER))
         return count
 
+    def get_still_water_tiles_count(self):
+        count = sum(1 for t, v in self.ground.items() if
+                    self.min.y <= t.y <= self.max.y and v in (STILL_WATER))
+        return count
+
     def __getitem__(self, item):
         return self.ground.get(item, SAND)
 
@@ -230,7 +235,8 @@ def solve():
     print(f"Part1 - The number of tiles the water can reach is: {water_tiles}")
 
     # Part 2
-    print(f"Part2 - ... is: {None}")
+    still_water_tiles = ground.get_still_water_tiles_count()
+    print(f"Part2 - The number of water tiles after draining is: {still_water_tiles}")
 
 
 if __name__ == "__main__":
