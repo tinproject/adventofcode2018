@@ -1,7 +1,7 @@
-from collections import Counter, deque
+from collections import deque
 from copy import copy
 from dataclasses import dataclass
-from operator import itemgetter, attrgetter
+from operator import attrgetter
 import re
 
 
@@ -167,8 +167,6 @@ class Ground:
                             break
 
                     # print(f"Water spans Left {left_end} {self[left_end]} Right {right_end} {self[right_end]}")
-                    # print(f"Water spans Left {left_end.left()} {self[left_end.left()]} Right {right_end.right()} {self[right_end.right()]}")
-
                     if self[left_end.left()] == CLAY and self[right_end.right()] == CLAY:
                         # print(f"Filling with water")
                         for x in range(left_end.x, right_end.x+1):
@@ -180,10 +178,10 @@ class Ground:
                         for x in range(left_end.x, right_end.x+1):
                             self[Coord(x, left_end.y)] = FLOWING_WATER
 
-                        if self[left_end.left()] == SAND:
+                        if self[left_end.left()] in (SAND, FLOWING_WATER):
                             # print(f"==============>> Append to process left {left_end}")
                             flow_to_process.append(left_end)
-                        if self[right_end.right()] == SAND:
+                        if self[right_end.right()] in (SAND, FLOWING_WATER):
                             # print(f"==============>> Append to process right {right_end}")
                             flow_to_process.append(right_end)
                         break
@@ -195,6 +193,11 @@ class Ground:
             # print(f"****   {self[current.down()]}")
 
             continue
+
+    def get_water_tiles_count(self):
+        count = sum(1 for t, v in self.ground.items() if
+                    self.min.y <= t.y <= self.max.y and v in (STILL_WATER, FLOWING_WATER))
+        return count
 
     def __getitem__(self, item):
         return self.ground.get(item, SAND)
@@ -220,15 +223,10 @@ def solve():
     # Part 1
     ground = Ground(data)
     ground.water_flow()
-    # try:
-    #     ground.water_flow()
-    # except Exception:
-    #     pass
+    water_tiles = ground.get_water_tiles_count()
     ground_slice = repr(ground)
     print(ground_slice)
     print("")
-    c = Counter(ground_slice)
-    water_tiles = c[STILL_WATER] + c[FLOWING_WATER]
     print(f"Part1 - The number of tiles the water can reach is: {water_tiles}")
 
     # Part 2

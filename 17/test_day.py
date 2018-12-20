@@ -49,3 +49,14 @@ def test_ground_input(coord, example_data):
     ground = Ground(example_data, water_spring)
 
     assert ground[point] == CLAY
+
+
+def test_get_water_tiles_count(example_data):
+    water_spring = Coord(500, 0)
+    ground = Ground(example_data, water_spring)
+    expected_count = 57
+
+    ground.water_flow()
+    result = ground.get_water_tiles_count()
+
+    assert result == expected_count
