@@ -1,0 +1,72 @@
+#ip 2
+00 seti 123 0 1        R1 = 123
+01 bani 1 456 1        R1 = R1 & 456
+02 eqri 1 72 1         if R1 == 72
+03 addr 1 2 2          goto l1
+04 seti 0 0 2          Test and, loop to start
+ label l1:
+05 seti 0 4 1          R1 = 0
+06 bori 1 65536 3      R3 = R1 | 10000h
+07 seti 10905776 4 1   R1 = A668B0h
+ label l3:
+08 bani 3 255 4        R4 = R3 & FF
+09 addr 1 4 1          R1 = R4 + R1
+10 bani 1 16777215 1   R1 = R1 & FFFFFFh
+11 muli 1 65899 1      R1 = R1 * 1016Bh
+12 bani 1 16777215 1   R1 = R1 & FFFFFFh
+13 gtir 256 3 4        if 100h > R3 -> R4               if 100h > R3 then goto l2 else R4 = 0
+14 addr 4 2 2          R2 = R2 + R4
+15 addi 2 1 2          R2 = R2 + 1
+16 seti 27 1 2         R2 = 27             goto l2
+17 seti 0 6 4          R4 = 0
+ label l5:
+18 addi 4 1 5          R5 = R4 + 1                      r5 = (r4+1) * 100h
+19 muli 5 256 5        R5 = R5 * 100h
+20 gtrr 5 3 5          if R5 > R3 -> R5                 if r5 > r3 then r4 += 1 goto l5 else goto l4
+21 addr 5 2 2          R2 = R2 + R5
+22 addi 2 1 2          R2 = R2 + 1
+23 seti 25 1 2         R2 = 25             goto l4
+24 addi 4 1 4          R4 = R4 + 1
+25 seti 17 9 2         R2 = 17             goto l5
+ label l4:
+26 setr 4 7 3          R3 = R4
+27 seti 7 4 2          R2 = 7              goto l3
+ label l2:
+28 eqrr 1 0 4          if R1 == R0 -> R4   if R1 == R0 -> exit
+29 addr 4 2 2          R2 = R2 + R4
+30 seti 5 1 2          R2 = 5              goto l1
+
+
+Instruction Pointer bound to register: 2
+Running assembly program:
+000 - seti 123 0 1
+001 - bani 1 456 1
+002 - eqri 1 72 1
+003 - addr 1 2 2
+004 - seti 0 0 2
+005 - seti 0 4 1
+006 - bori 1 65536 3
+007 - seti 10905776 4 1
+008 - bani 3 255 4
+009 - addr 1 4 1
+010 - bani 1 16777215 1
+011 - muli 1 65899 1
+012 - bani 1 16777215 1
+013 - gtir 256 3 4
+014 - addr 4 2 2
+015 - addi 2 1 2
+016 - seti 27 1 2
+017 - seti 0 6 4
+018 - addi 4 1 5
+019 - muli 5 256 5
+020 - gtrr 5 3 5
+021 - addr 5 2 2
+022 - addi 2 1 2
+023 - seti 25 1 2
+024 - addi 4 1 4
+025 - seti 17 9 2
+026 - setr 4 7 3
+027 - seti 7 4 2
+028 - eqrr 1 0 4
+029 - addr 4 2 2
+030 - seti 5 1 2
