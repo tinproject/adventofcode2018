@@ -3,10 +3,14 @@ from functools import lru_cache
 
 
 MOUTH = 'M'
-TARGET = 'X'
+TARGET = 'T'
 ROCKY = '.'
 WET = '='
 NARROW = '|'
+
+TOOL_CLIMBING = 'C'
+TOOL_TORCH = 'H'
+TOOL_NONE = 'N'
 
 
 class Cave:
@@ -62,6 +66,9 @@ class Cave:
         ))
         return risk_level
 
+    def get_fastest_time_to_get_target(self):
+        raise NotImplementedError
+
     def __setitem__(self, point, value):
         self.tiles[point] = value
 
@@ -73,7 +80,10 @@ class Cave:
         return value
 
     def __repr__(self):
-        return ""
+        cave = []
+        for y in range(self.mouth[1], self.target[1]+1):
+            cave.append("".join(self[(x, y)] for x in range(self.mouth[0], self.target[0]+1)))
+        return "\n".join(cave)
 
 
 def solve():
@@ -87,7 +97,8 @@ def solve():
     print(f"Part1 - The risk level of the smalles rectangle that include the mouth and target is: {risk_level}")
 
     # Part 2
-    print(f"Part2 - ... is: {None}")
+    fastest_time = cave.get_fastest_time_to_get_target()
+    print(f"Part2 - The fewest number of minutes to get the target are: {fastest_time}")
 
 
 if __name__ == "__main__":

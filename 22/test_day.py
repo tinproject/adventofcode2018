@@ -65,3 +65,12 @@ def test_risk_level(example_cave):
     result = example_cave.get_risk_level()
 
     assert result == expected_risk_level
+
+
+@pytest.mark.skip(reason="Time's up!")
+def test_get_fastest_time_to_get_target(example_cave):
+    expected_fastest_way = 45
+
+    result = example_cave.get_fastest_time_to_get_target()
+
+    assert result == expected_fastest_way
