@@ -21,6 +21,7 @@ class Processor:
         self.instruction_pointer = 0
         self.instruction_pointer_bound_to_reg = None
         self.program_memory = []
+        self.trace = []
 
     def set_state(self, registers):
         if len(registers) != self._REGISTER_NUMBER:
@@ -42,6 +43,15 @@ class Processor:
 
         # print(f"ip={self.instruction_pointer} {self.registers} ", end="")
         op, a, b, c = self.program_memory[self.instruction_pointer]
+        if op.startswith('trace'):
+            r = int(op.split('-')[1])
+            op = op.split('-')[2]
+            print(f"Trace {self.instruction_counter:08} OP: {op} R{r}: {self.registers[r]}")
+            length = len(self.trace)
+            self.trace.append((self.instruction_counter, self.registers[r]))
+            if len(set(self.trace)) < length:
+                raise Exception
+
         getattr(self, op)(a, b, c)
         # print(f"{op} {a} {b} {c} {self.registers}")
 
@@ -56,14 +66,14 @@ class Processor:
         # print(f"Running assembly program:")
         # [print(f"{i:03} - {v[0]} {v[1]} {v[2]} {v[3]}") for i, v in enumerate(self.program_memory)]
 
-        instructions = 0
+        self.instruction_counter = 0
         program_size = len(self.program_memory)
         for _ in range(max_cycles):
             if self.instruction_pointer >= program_size:
                 break
             self.execute_instruction()
-            instructions += 1
-        return instructions
+            self.instruction_counter += 1
+        return self.instruction_counter
 
     def load_program(self, program):
         self.init_program_memory()
@@ -129,6 +139,28 @@ class Processor:
         self.registers[c] = 1 if self.registers[a] == self.registers[b] else 0
 
 
+def solve_part_2():
+    values = dict()
+    r1 = 0
+    while True:  # l6
+        r3 = r1 | 0x10000
+        r1 = 10905776
+        while True:  # l3
+            r4 = r3 & 0xFF
+            r1 += r4
+            r1 &= 0xFFFFFF
+            r1 *= 65899
+            r1 &= 0xFFFFFF
+            if 0x100 > r3:
+                if r1 in values:
+                    return list(values.keys())[-1]
+                else:
+                    # print(r1)
+                    values[r1] = r1
+                    break
+            r3 //= 0x100
+
+
 def solve():
     data = get_data()
 
@@ -139,10 +171,19 @@ def solve():
     processor.program_memory[28] = ('seti', 44, 2, 2)
     num_instructions = processor.run(max_cycles=3000000)
     reg1_value = processor.get_register_value(1)
-    print(f"Part1 - The lowest non negative integer that causes the program to halt is: {reg1_value}, after {num_instructions} instructions")
+    print(f"Part1 - The lowest non negative integer that causes the program "
+          f"to halt is: {reg1_value}, after {num_instructions} instructions")
 
     # Part 2
-    print(f"Part2 - ... is: {None}")
+    # processor = Processor()
+    # processor.load_program(data)
+    # processor.set_register_value(0, 0)
+    # processor.program_memory[28] = ('trace-1-eqrr', 1, 0, 4)
+    # num_instructions = processor.run(max_cycles=300000000)
+    # reg1_value = processor.get_register_value(1)
+    reg1_value = solve_part_2()
+    print(f"Part2 - The lowest non negative integer that causes the program "
+          f"to halt after executing the most instructions is: {reg1_value}")
 
 
 if __name__ == "__main__":

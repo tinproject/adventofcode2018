@@ -6,6 +6,7 @@
 04 seti 0 0 2          Test and, loop to start
  label l1:
 05 seti 0 4 1          R1 = 0
+ label l6:
 06 bori 1 65536 3      R3 = R1 | 10000h
 07 seti 10905776 4 1   R1 = A668B0h
  label l3:
@@ -34,7 +35,7 @@
  label l2:
 28 eqrr 1 0 4          if R1 == R0 -> R4   if R1 == R0 -> exit
 29 addr 4 2 2          R2 = R2 + R4
-30 seti 5 1 2          R2 = 5              goto l1
+30 seti 5 1 2          R2 = 5              goto l6
 
 
 Instruction Pointer bound to register: 2
